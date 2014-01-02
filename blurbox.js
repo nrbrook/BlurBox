@@ -14,7 +14,7 @@
 #blurbox-wrapper { overflow: hidden; padding: 10px; border-radius: 5px; background-color: white; opacity: 0; position: absolute; top: 50%; left: 50%; z-index: 9999; width: 50%; height: 50%; display: block; -webkit-transition: opacity 300ms; -moz-transition: opacity 300ms; -ms-transition: opacity 300ms; -o-transition: opacity 300ms; transition: opacity 300ms; }\
 #blurbox-wrapper.blurbox-wrapper-fixed { position: fixed; margin: auto; }\
 #blurbox-wrapper.blurbox-show { opacity: 1; }\
-#blurbox-darkenbg { opacity: 0; top: 0; left: 0; background-color: rgba(0,0,0,0.2); z-index: 9999; position: absolute; height: 100%; width: 100%; }\
+#blurbox-darkenbg { opacity: 0; top: 0; left: 0; background-color: rgba(0,0,0,0.2); z-index: 9999; position: absolute; height: 100%; width: 100%; -webkit-transition: opacity 300ms; -moz-transition: opacity 300ms; -ms-transition: opacity 300ms; -o-transition: opacity 300ms; transition: opacity 300ms; }\
 #blurbox-darkenbg.blurbox-show { opacity: 1; }\
 .blurbox-bodyContent { -webkit-transition: -webkit-filter 300ms, filter 300ms; -moz-transition: -moz-filter 300ms, filter 300ms; -o-transition: -o-filter 300ms, filter 300ms; -ms-transition: -ms-filter 300ms, filter 300ms; transition: filter 300ms; }\
 .blurbox-bodyContent-show.blurbox-bodyContent-blur3 { filter: blur(3px); -webkit-filter: blur(3px); -moz-filter: blur(3px); -o-filter: blur(3px); -ms-filter: blur(3px); filter: url(blur.svg#blur3); }\
