@@ -18,6 +18,7 @@
 #blurbox-darkenbg.blurbox-show { opacity: 1; }\
 .blurbox-bodyContent { -webkit-transition: -webkit-filter 300ms, filter 300ms; -moz-transition: -moz-filter 300ms, filter 300ms; -o-transition: -o-filter 300ms, filter 300ms; -ms-transition: -ms-filter 300ms, filter 300ms; transition: filter 300ms; }\
 .blurbox-bodyContent-show.blurbox-bodyContent-blur3 { filter: blur(3px); -webkit-filter: blur(3px); -moz-filter: blur(3px); -o-filter: blur(3px); -ms-filter: blur(3px); filter: url(blur.svg#blur3); }\
+.blurbox-bodyContent-show.blurbox-bodyContent-blur6 { filter: blur(6px); -webkit-filter: blur(6px); -moz-filter: blur(6px); -o-filter: blur(6px); -ms-filter: blur(6px); filter: url(blur.svg#blur6); }\
 ';
 	$('head').append('<style>'+style+'</style>');
 	var pluginName = 'blurbox',

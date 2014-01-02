@@ -1,1 +1,1 @@
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg"><filter id="blur1"><feGaussianBlur stdDeviation="1" /></filter><filter id="blur3"><feGaussianBlur stdDeviation="3" /><filter id="blur5"><feGaussianBlur stdDeviation="5" /></filter></filter></svg>
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg"><filter id="blur1"><feGaussianBlur stdDeviation="1" /></filter><filter id="blur3"><feGaussianBlur stdDeviation="3" /><filter id="blur6"><feGaussianBlur stdDeviation="6" /></filter></filter></svg>
