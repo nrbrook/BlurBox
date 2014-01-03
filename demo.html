@@ -40,7 +40,7 @@ Praesent dui justo, venenatis vitae ultrices eu, fermentum vel odio. Integer nib
 <script src="blurbox.js"></script>
 <script>
 setTimeout(function() {
-	var bb = $('#popup').blurbox()
+	var bb = $('#popup').blurbox({blur: 10, animateBlur: true, bgColor: 'rgba(255,255,0,0.2)'})
 	bb.show();
 },1000);
 </script>

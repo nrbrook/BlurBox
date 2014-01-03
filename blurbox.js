@@ -11,47 +11,57 @@
 	
 	var style = '\
 .blurbox-hidden { display: none !important; }\
-#blurbox-wrapper { overflow: hidden; padding: 10px; border-radius: 5px; background-color: white; opacity: 0; position: absolute; top: 50%; left: 50%; z-index: 9999; width: 50%; height: 50%; display: block; -webkit-transition: opacity 300ms; -moz-transition: opacity 300ms; -ms-transition: opacity 300ms; -o-transition: opacity 300ms; transition: opacity 300ms; }\
+#blurbox-wrapper { overflow: hidden; padding: 10px; border-radius: 5px; background-color: white; opacity: 0; position: absolute; top: 50%; left: 50%; z-index: 9999; width: 50%; height: 50%; display: block; }\
 #blurbox-wrapper.blurbox-wrapper-fixed { position: fixed; margin: auto; }\
 #blurbox-wrapper.blurbox-show { opacity: 1; }\
-#blurbox-darkenbg { opacity: 0; top: 0; left: 0; background-color: rgba(0,0,0,0.2); z-index: 9999; position: absolute; height: 100%; width: 100%; -webkit-transition: opacity 300ms; -moz-transition: opacity 300ms; -ms-transition: opacity 300ms; -o-transition: opacity 300ms; transition: opacity 300ms; }\
+#blurbox-darkenbg { opacity: 0; top: 0; left: 0; z-index: 9999; position: absolute; height: 100%; width: 100%; }\
 #blurbox-darkenbg.blurbox-show { opacity: 1; }\
-.blurbox-bodyContent { -webkit-transition: -webkit-filter 300ms, filter 300ms; -moz-transition: -moz-filter 300ms, filter 300ms; -o-transition: -o-filter 300ms, filter 300ms; -ms-transition: -ms-filter 300ms, filter 300ms; transition: filter 300ms; }\
-.blurbox-bodyContent-show.blurbox-bodyContent-blur3 { filter: blur(3px); -webkit-filter: blur(3px); -moz-filter: blur(3px); -o-filter: blur(3px); -ms-filter: blur(3px); filter: url(blur.svg#blur3); }\
-.blurbox-bodyContent-show.blurbox-bodyContent-blur6 { filter: blur(6px); -webkit-filter: blur(6px); -moz-filter: blur(6px); -o-filter: blur(6px); -ms-filter: blur(6px); filter: url(blur.svg#blur6); }\
-';
+',
+ffsvg = 'url("data:image/svg+xml;utf8,'+encodeURIComponent('<svg version="1.1" xmlns="http://www.w3.org/2000/svg"><filter id="blur"><feGaussianBlur stdDeviation="')+'{blur}'+encodeURIComponent('" /></filter></svg>')+'#blur")';
+
 	$('head').append('<style>'+style+'</style>');
 	var pluginName = 'blurbox',
-		defaults = {
-			blur: 3,
-			autosize: true,
-			fixed: true,
-			darken: true
-		},
 		plugin = function( element, options ) {
 	        this.element = $(element);
-			
-	        this.options = $.extend( {}, defaults, options) ;
-        
-	        this._defaults = defaults;
-	        this._name = pluginName;
-        
-	        this.init();
-	    },
-		// stores the active blurbox
-		activeBlurbox;
-	
-	$.extend(plugin.prototype, {
-		init: function() {
-			this.displayed = false;
-			this.element.detach();
-			
+	        this.options = $.extend( {}, plugin.defaults, options);
+	        this._init();
+	    };
+		
+	$.extend(plugin, {
+		defaults: {
+			blur: 3,
+			animateBlur: true,
+			duration: 300,
+			autosize: true,
+			fixed: true,
+			bgColor: 'rgba(0,0,0,0.2)',
+			bodyContent: null
+		},
+		activeBlurbox: null,
+		darkenbg: null,
+		wrapper: null,
+		bodyContent: null,
+		styleProps: {
+			filter: 'filter',
+			transition: 'transition',
+		},
+		cssProps: {
+			filter: 'filter',
+			transition: 'transition'
+		},
+		stylePropVals: {
+			filter: 'blur({blur}px)',
+			transition: '{prop} {dur}ms'
+		},
+		stylePrefixes: ['Moz', 'Webkit', 'Khtml', 'O', 'Ms'],
+		transitionEndEvents: 'webkitTransitionEnd mozTransitionEnd msTransitionEnd oTransitionEnd',
+		_init: function() {
 			this.darkenbg = $('#blurbox-darkenbg');
 			if(!this.darkenbg.length) {
 				this.darkenbg = $('<div id="blurbox-darkenbg" class="blurbox-hidden">');
 				$('body').append(this.darkenbg);
 				this.darkenbg.click(function() {
-					activeBlurbox.hide();
+					plugin.activeBlurbox.hide();
 				});
 			}
 			
@@ -61,46 +71,145 @@
 				$('body').append(this.wrapper);
 			}
 			
-			this.bodyContent = this.options.bodyContent || $('body').children(':first');
+			this.bodyContent = $('body').children(':first');
+			
+			this._determineProps();
+		},
+		_testStylePrefixes: function(s, prop, testVal) {
+			// test no prefix first
+			if(s[prop] !== undefined) {
+				s[prop] = testVal;
+				if(s[testprop] === testVal) {
+					plugin.styleProps[prop] = prop;
+					plugin.cssProps[prop] = prop;
+					return;
+				}
+			}
+			var capprop = prop.substr(0,1).toUpperCase()+prop.substr(1),
+				testprop;
+			$.each(this.stylePrefixes, function(i,v) {
+				testprop = v+capprop;
+				// check if the property exists
+				if(s[testprop] !== undefined) {
+					// try setting it (for webkit)
+					s[testprop] = testVal;
+					if(s[testprop] === testVal) {
+						plugin.styleProps[prop] = testprop;
+						plugin.cssProps[prop] = '-'+v.toLowerCase()+'-'+prop;
+						return false;
+					}
+				}
+			});
+		},
+		_determineProps: function() {
+			var s = $('<div>')[0].style;
+			plugin._testStylePrefixes(s, 'filter', 'blur(3px)')
+			if(plugin.styleProps.filter === 'filter') {
+				// test for moz
+				var testval = ffsvg.replace('{blur}',1);
+				s.filter = testval;
+				if(s.filter === testval) {
+					plugin.stylePropVals.filter = ffsvg;
+				}
+			}
+			plugin._testStylePrefixes(s, 'transition', 'width 100ms');
+		},
+		_applyProp: function(el,prop,subs) {
+			var val = plugin.stylePropVals[prop];
+			$.each(subs, function(k,v) {
+				val = val.replace('{'+k+'}', v);
+			});
+			el.style[plugin.styleProps[prop]] = val;
+		},
+		_removeProp: function(el, prop) {
+			el.style[plugin.styleProps[prop]] = '';
+		},
+		hide: function() {
+			if(this.activeBlurbox) {
+				this.activeBlurbox.hide();
+			}
+		}
+	});
+	
+	plugin._init();
+	
+	$.extend(plugin.prototype, {
+		_init: function() {
+			this.displayed = false;
+			this.element.detach();
+			this.applyOptions(this.options);
+		},
+		
+		applyOptions: function(options) {
+			this.options = $.extend( {}, plugin.defaults, options);;
+			
+			this.bodyContent = this.options.bodyContent || plugin.bodyContent;
 			this.bodyContent.addClass('blurbox-bodyContent');
+			
+			// apply styles
+			plugin._applyProp(plugin.wrapper[0], 'transition', {prop:'opacity',dur:this.options.duration});
+			plugin._applyProp(plugin.darkenbg[0], 'transition', {prop:'opacity',dur:this.options.duration});
+			if(this.options.animateBlur) {
+				plugin._applyProp(this.bodyContent[0], 'transition', {prop:plugin.cssProps.filter,dur:this.options.duration});
+			} else {
+				plugin._removeProp(this.bodyContent[0], 'transition');
+			}
+			
+			plugin.darkenbg.css('backgroundColor', this.options.bgColor || '');
 		},
 		
 		show: function(options) {
-			if(!$.isPlainObject(options)) options = {};
-			options = $.extend({}, this.options, options);
+			if(options && $.isPlainObject(options)) {
+				this.applyOptions(options);
+			}
 			
-			if(activeBlurbox) {
-				activeBlurbox.hide();
+			if(plugin.activeBlurbox) {
+				plugin.activeBlurbox.hide();
 			}
 
 			$(document).trigger('blurbox-willShow', this);
 
 			this.element.detach();
 
-			if(options.autosize) {
+			if(this.options.autosize) {
 				this.autosize();
 			}
-
-			this.wrapper.html(this.element);
+			
+			plugin.wrapper.html(this.element);
 			this.element.show();
-			this.bodyContent.addClass('blurbox-bodyContent-show blurbox-bodyContent-blur'+options.blur);
-			this.wrapper.toggleClass('blurbox-wrapper-fixed', options.fixed);
-			this.wrapper.removeClass('blurbox-hidden');
-			if(options.darken) {
-				this.darkenbg.removeClass('blurbox-hidden');
+			if(this.options.animateBlur && this.options.blur > 0) {
+				plugin._applyProp(this.bodyContent[0], 'filter', {blur:this.options.blur});
 			}
-			var t = this;
+			plugin.wrapper.toggleClass('blurbox-wrapper-fixed', this.options.fixed);
+			plugin.wrapper.removeClass('blurbox-hidden');
+			if(this.options.bgColor) {
+				plugin.darkenbg.removeClass('blurbox-hidden');
+			}
+			plugin.wrapper.css({'margin-left':'-'+(plugin.wrapper.width()/2)+'px', 'margin-top':'-'+(plugin.wrapper.height()/2)+'px'})
+			
+			var t = this,
+				endAnim = function() {
+					if(!t.options.animateBlur && t.options.blur > 0) {
+						plugin._applyProp(t.bodyContent[0], 'filter', {blur:t.options.blur});
+					}
+					plugin.wrapper.off(plugin.tranisitionEndEvents);
+					clearTimeout(timeout);
+				},
+				timeout;
+			// set timeout at 0 to let elements be rendered first after display:none has been removed
 			setTimeout(function() {
-				t.wrapper.addClass('blurbox-show');
-				if(options.darken) {
-					t.darkenbg.addClass('blurbox-show');
+				plugin.wrapper.addClass('blurbox-show');
+				if(t.options.bgColor) {
+					plugin.darkenbg.addClass('blurbox-show');
 				}
 				t.bodyContent.on('click.blurbox', $.proxy(t.hide,t));
+				
+				timeout = setTimeout(endAnim, t.options.duration+50);
+				plugin.wrapper.on(plugin.tranisitionEndEvents, endAnim);
 			},0);
-			this.wrapper.css({'margin-left':'-'+(this.wrapper.width()/2)+'px', 'margin-top':'-'+(this.wrapper.height()/2)+'px'})
 			
 			this.displayed = true;
-			activeBlurbox = this;
+			plugin.activeBlurbox = this;
 			
 			$(document).trigger('blurbox-didShow', this);
 			
@@ -110,21 +219,19 @@
 		hide: function() {
 			$(document).trigger('blurbox-willHide', this);
 			this.bodyContent.off('click.blurbox');
-			this.wrapper.removeClass('blurbox-show');
-			this.darkenbg.removeClass('blurbox-show');
-			var t = this,
-				endEvents = 'webkitTransitionEnd mozTransitionEnd msTransitionEnd oTransitionEnd',
-				endAnim = function() {
-					t.wrapper.addClass('blurbox-hidden');
-					t.darkenbg.addClass('blurbox-hidden');
-					t.wrapper.off(endEvents);
+			plugin.wrapper.removeClass('blurbox-show');
+			plugin.darkenbg.removeClass('blurbox-show');
+			var endAnim = function() {
+					plugin.wrapper.addClass('blurbox-hidden');
+					plugin.darkenbg.addClass('blurbox-hidden');
+					plugin.wrapper.off(plugin.tranisitionEndEvents);
 					clearTimeout(timeout);
 				},
-				timeout = setTimeout(endAnim, 350);
-			this.wrapper.on(endEvents, endAnim);
-			this.bodyContent.removeClass('blurbox-bodyContent-show blurbox-bodyContent-blur3');
+				timeout = setTimeout(endAnim, this.options.duration);
+			plugin.wrapper.on(plugin.tranisitionEndEvents, endAnim);
+			plugin._removeProp(this.bodyContent[0], 'filter');
 			this.displayed = false;
-			activeBlurbox = null;
+			plugin.activeBlurbox = null;
 			$(document).trigger('blurbox-didHide', this);
 			return this;
 		},
@@ -142,7 +249,7 @@
 			var height = this.element.height();
 			this.element.detach();
 			style ? this.element.attr('style', style) : this.element.removeAttr('style');
-			this.wrapper.css({width:width,height:height});
+			plugin.wrapper.css({width:width,height:height});
 		}
 	});
 	
@@ -154,4 +261,6 @@
 		$.data(this, 'plugin_' + pluginName, p);
 		return p;
     };
+	
+	$[pluginName] = plugin;
 }));
