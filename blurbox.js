@@ -15,7 +15,7 @@ body, html { width: 100%; height: 100%; margin: 0; padding: 0; }\
 .blurbox-hidden { display: none !important; }\
 #blurbox-wrapper { overflow: auto; padding: 10px; border-radius: 5px; background-color: white; opacity: 0; position: fixed; top: 50%; left: 50%; z-index: 9999; width: 50%; height: 50%; max-width: 95%; max-height: 95%; display: block; }\
 #blurbox-wrapper.blurbox-show { opacity: 1; }\
-#blurbox-darkenbg { opacity: 0; top: 0; left: 0; z-index: 9999; position: fixed; height: 100%; width: 100%; }\
+#blurbox-darkenbg { opacity: 0; top: 0; left: 0; z-index: 9998; position: fixed; height: 100%; width: 100%; }\
 #blurbox-darkenbg.blurbox-show { opacity: 1; }\
 @media (max-width: 480px) {\
 	#blurbox-wrapper { margin: 0; left: 0; height: 100%; width: 100%; top: 100%; opacity: 1; border-radius: 0; max-height: none; max-width: none; }\
@@ -182,7 +182,7 @@ ffsvg = 'url("data:image/svg+xml;utf8,'+encodeURIComponent('<svg version="1.1" x
 				plugin.activeBlurbox.hide();
 			}
 
-			$(document).trigger('blurbox-willShow', this);
+			$(document).trigger('blurbox.willShow', this);
 
 			this.element.detach();
 
@@ -232,7 +232,7 @@ ffsvg = 'url("data:image/svg+xml;utf8,'+encodeURIComponent('<svg version="1.1" x
 			this.displayed = true;
 			plugin.activeBlurbox = this;
 			
-			$(document).trigger('blurbox-didShow', this);
+			$(document).trigger('blurbox.didShow', this);
 			
 			return this;
 		},
@@ -240,7 +240,7 @@ ffsvg = 'url("data:image/svg+xml;utf8,'+encodeURIComponent('<svg version="1.1" x
 		hide: function(options) {
 			this.applyOptions((options && $.isPlainObject(options)) || {});
 
-			$(document).trigger('blurbox-willHide', this);
+			$(document).trigger('blurbox.willHide', this);
 			this.bodyContent.off('click.blurbox');
 			// allow scroll on body
 			this.bodyContent.removeClass('blurbox-noscroll');
@@ -263,7 +263,7 @@ ffsvg = 'url("data:image/svg+xml;utf8,'+encodeURIComponent('<svg version="1.1" x
 			plugin._removeProp(this.bodyContent[0], 'filter');
 			this.displayed = false;
 			plugin.activeBlurbox = null;
-			$(document).trigger('blurbox-didHide', this);
+			$(document).trigger('blurbox.didHide', this);
 			return this;
 		},
 
@@ -275,7 +275,7 @@ ffsvg = 'url("data:image/svg+xml;utf8,'+encodeURIComponent('<svg version="1.1" x
 			if(renderOffscreen) {
 				var style = this.element.attr('style');
 				// render off screen for size
-				this.element.css({position:'absolute',left:100000,display:'block'});
+				this.element.css({position:'absolute',left:'100000px',display:'block'});
 				$('body').append(this.element);
 			}
 			var width = this.element.width();
