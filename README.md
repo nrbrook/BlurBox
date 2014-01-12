@@ -4,6 +4,8 @@
 
 BlurBox is a lightbox which blurs the background.  Simple!
 
+On small screens (<= 480px), a lightbox doesn't make much sense, so the plugin instead switches to a sheet which slides up from the bottom and just darkens the background (no blur)
+
 ### [Demo](http://nrbrook.github.io/BlurBox)
 
 It is a jQuery plugin, but it wouldn't be much work to seperate out the jQuery goodness or even just substitute jQuery for a shim with the same interface.

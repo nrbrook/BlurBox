@@ -13,10 +13,14 @@
 body, html { width: 100%; height: 100%; margin: 0; padding: 0; }\
 .blurbox-noscroll { overflow: hidden; height: 100%; width: 100%; }\
 .blurbox-hidden { display: none !important; }\
-#blurbox-wrapper { overflow: hidden; padding: 10px; border-radius: 5px; background-color: white; opacity: 0; position: fixed; top: 50%; left: 50%; z-index: 9999; width: 50%; height: 50%; display: block; }\
+#blurbox-wrapper { overflow: auto; padding: 10px; border-radius: 5px; background-color: white; opacity: 0; position: fixed; top: 50%; left: 50%; z-index: 9999; width: 50%; height: 50%; max-width: 95%; max-height: 95%; display: block; }\
 #blurbox-wrapper.blurbox-show { opacity: 1; }\
 #blurbox-darkenbg { opacity: 0; top: 0; left: 0; z-index: 9999; position: fixed; height: 100%; width: 100%; }\
 #blurbox-darkenbg.blurbox-show { opacity: 1; }\
+@media (max-width: 480px) {\
+	#blurbox-wrapper { margin: 0; left: 0; height: 100%; width: 100%; top: 100%; opacity: 1; border-radius: 0; max-height: none; max-width: none; }\
+	#blurbox-wrapper.blurbox-show { top: 0; }\
+}\
 ',
 ffsvg = 'url("data:image/svg+xml;utf8,'+encodeURIComponent('<svg version="1.1" xmlns="http://www.w3.org/2000/svg"><filter id="blur"><feGaussianBlur stdDeviation="')+'{blur}'+encodeURIComponent('" /></filter></svg>')+'#blur")';
 
@@ -116,9 +120,21 @@ ffsvg = 'url("data:image/svg+xml;utf8,'+encodeURIComponent('<svg version="1.1" x
 		},
 		_applyProp: function(el,prop,subs) {
 			var val = plugin.stylePropVals[prop];
-			$.each(subs, function(k,v) {
-				val = val.replace('{'+k+'}', v);
-			});
+			if($.isPlainObject(subs)) {
+				$.each(subs, function(k,v) {
+					val = val.replace('{'+k+'}', v);
+				});
+			} else {
+				// array of property values
+				var vals = [];
+				$.each(subs, function(i,sub) {
+					$.each(sub, function(k,v) {
+						vals.push(val.replace('{'+k+'}', v));
+					});
+				});
+				val = vals.join(', ');
+			}
+			
 			el.style[plugin.styleProps[prop]] = val;
 		},
 		_removeProp: function(el, prop) {
@@ -147,7 +163,8 @@ ffsvg = 'url("data:image/svg+xml;utf8,'+encodeURIComponent('<svg version="1.1" x
 			this.bodyContent.addClass('blurbox-bodyContent');
 			
 			// apply styles
-			plugin._applyProp(plugin.wrapper[0], 'transition', {prop:'opacity',dur:this.options.duration});
+			var isSmall = $('body').width() <= 480;
+			plugin._applyProp(plugin.wrapper[0], 'transition', {prop:isSmall ? 'top' : 'opacity',dur:this.options.duration});
 			plugin._applyProp(plugin.darkenbg[0], 'transition', {prop:'opacity',dur:this.options.duration});
 			if(this.options.animateBlur) {
 				plugin._applyProp(this.bodyContent[0], 'transition', {prop:plugin.cssProps.filter,dur:this.options.duration});
@@ -169,7 +186,8 @@ ffsvg = 'url("data:image/svg+xml;utf8,'+encodeURIComponent('<svg version="1.1" x
 
 			this.element.detach();
 
-			if(this.options.autosize) {
+			var isBig = $('body').width() > 480;
+			if(isBig && this.options.autosize) {
 				this.autosize(true);
 			}
 			
@@ -179,14 +197,16 @@ ffsvg = 'url("data:image/svg+xml;utf8,'+encodeURIComponent('<svg version="1.1" x
 			plugin.wrapper.html(this.element);
 			this.element.show();
 			// blur it
-			if(this.options.animateBlur && this.options.blur > 0) {
+			if(isBig && this.options.animateBlur && this.options.blur > 0) {
 				plugin._applyProp(this.bodyContent[0], 'filter', {blur:this.options.blur});
 			}
 			plugin.wrapper.removeClass('blurbox-hidden');
 			if(this.options.bgColor) {
 				plugin.darkenbg.removeClass('blurbox-hidden');
 			}
-			plugin.wrapper.css({'margin-left':'-'+(plugin.wrapper.width()/2)+'px', 'margin-top':'-'+(plugin.wrapper.height()/2)+'px'})
+			if(isBig) {
+				plugin.wrapper.css({'margin-left':'-'+(plugin.wrapper.width()/2)+'px', 'margin-top':'-'+(plugin.wrapper.height()/2)+'px'})
+			}
 			
 			var t = this,
 				endAnim = function() {
