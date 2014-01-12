@@ -43,10 +43,15 @@ The options object can be passed in to the constructor, set afterwards using `ob
 Defaults can be set on BlurBox.defaults
 
 `blur` (3) [px] The blur radius in pixels
+
 `animateBlur` (true) [bool] If the plugin should use CSS transitions to animate the blur.  This can be slow on older browsers / low power graphics cards
+
 `duration` (300) [ms] The duration of the show and hide animation
+
 `autosize` (true) [bool] If true, the plugin will autosize the lightbox to fit the dimensions of the content.  Otherwise will use width/height 50%
+
 `bgColor` ('rgba(0,0,0,0.2)') [colour string] If not null, the plugin will tint the background with this colour
+
 `bodyContent` (null) [element] The plugin will blur this element.  By default, uses the first child of `body`
 
 ## Function Reference
