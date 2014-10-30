@@ -13,7 +13,8 @@
 body, html { width: 100%; height: 100%; margin: 0; padding: 0; }\
 .blurbox-noscroll { overflow: hidden; height: 100%; width: 100%; }\
 .blurbox-hidden { display: none !important; }\
-#blurbox-wrapper { overflow: auto; padding: 10px; border-radius: 5px; background-color: white; opacity: 0; position: fixed; top: 50%; left: 50%; z-index: 9999; width: 50%; height: 50%; max-width: 95%; max-height: 95%; display: block; box-sizing: border-box; }\
+#blurbox-wrapper { overflow: auto; padding: 10px; border-radius: 5px; background-color: white; opacity: 0; position: fixed; top: 50%; left: 50%; z-index: 9999; width: 50%; height: 50%; max-width: 95%; max-height: 95%; display: block; }\
+#blurbox-wrapper.blurbox-small { box-sizing: border-box; }\
 #blurbox-wrapper.blurbox-show { opacity: 1; }\
 #blurbox-darkenbg { opacity: 0; top: 0; left: 0; z-index: 9998; position: fixed; height: 100%; width: 100%; }\
 #blurbox-darkenbg.blurbox-show { opacity: 1; }\
@@ -187,6 +188,9 @@ ffsvg = 'url("data:image/svg+xml;utf8,'+encodeURIComponent('<svg version="1.1" x
 			this.element.detach();
 
 			var isBig = $('body').width() > 480;
+
+            plugin.wrapper.addClass(isBig ? 'blurbox-big' : 'blurbox-small');
+
 			if(isBig && this.options.autosize) {
 				this.autosize(true);
 			}
@@ -251,7 +255,8 @@ ffsvg = 'url("data:image/svg+xml;utf8,'+encodeURIComponent('<svg version="1.1" x
 			// set a timeout and listen for transition end events, whichever happens first end the animation
 			var endAnim = function() {
 					// at end of animation, display:none the wrapper
-					plugin.wrapper.addClass('blurbox-hidden');
+					plugin.wrapper.addClass('blurbox-hidden').removeClass('blurbox-big').removeClass('blurbox-small');
+                    plugin.wrapper.css({height:'',width:'','margin-left':'', 'margin-top':''});
 					// and the overlay
 					plugin.darkenbg.addClass('blurbox-hidden');
 					// stop listening for animation end events and clear the timeout
