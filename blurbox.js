@@ -40,7 +40,8 @@ ffsvg = 'url("data:image/svg+xml;utf8,'+encodeURIComponent('<svg version="1.1" x
 			duration: 300,
 			autosize: true,
 			bgColor: 'rgba(0,0,0,0.2)',
-			bodyContent: null
+			bodyContent: null,
+			closeOnBackgroundClick: true
 		},
 		activeBlurbox: null,
 		darkenbg: null,
@@ -66,7 +67,9 @@ ffsvg = 'url("data:image/svg+xml;utf8,'+encodeURIComponent('<svg version="1.1" x
 				this.darkenbg = $('<div id="blurbox-darkenbg" class="blurbox-hidden">');
 				$('body').append(this.darkenbg);
 				this.darkenbg.click(function() {
-					plugin.activeBlurbox.hide();
+					if(plugin.activeBlurbox && plugin.activeBlurbox.options.closeOnBackgroundClick) {
+						plugin.activeBlurbox.hide();
+					}
 				});
 			}
 			
@@ -158,7 +161,7 @@ ffsvg = 'url("data:image/svg+xml;utf8,'+encodeURIComponent('<svg version="1.1" x
 		},
 		
 		applyOptions: function(options) {
-			this.options = $.extend( {}, plugin.defaults, options);;
+			this.options = $.extend( {}, this.options, options);
 			
 			this.bodyContent = this.options.bodyContent || plugin.bodyContent;
 			this.bodyContent.addClass('blurbox-bodyContent');
@@ -227,7 +230,6 @@ ffsvg = 'url("data:image/svg+xml;utf8,'+encodeURIComponent('<svg version="1.1" x
 				if(t.options.bgColor) {
 					plugin.darkenbg.addClass('blurbox-show');
 				}
-				t.bodyContent.on('click.blurbox', $.proxy(t.hide,t));
 				
 				timeout = setTimeout(endAnim, t.options.duration+50);
 				plugin.wrapper.on(plugin.tranisitionEndEvents, endAnim);
@@ -245,7 +247,6 @@ ffsvg = 'url("data:image/svg+xml;utf8,'+encodeURIComponent('<svg version="1.1" x
 			this.applyOptions((options && $.isPlainObject(options)) || {});
 
 			$(document).trigger('blurbox.willHide', this);
-			this.bodyContent.off('click.blurbox');
 			// allow scroll on body
 			this.bodyContent.removeClass('blurbox-noscroll');
 			// hide the wrapper

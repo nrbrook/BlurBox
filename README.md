@@ -56,6 +56,8 @@ Defaults can be set on BlurBox.defaults
 
 `bodyContent` (null) [element] The plugin will blur this element.  By default, uses the first child of `body`
 
+`closeOnBackgroundClick` (true) [bool] If true, clicking on the blurred background will close the box
+
 ## Function Reference
 
 ### jQuery prototype constructor
