@@ -62,26 +62,29 @@ ffsvg = 'url("data:image/svg+xml;utf8,'+encodeURIComponent('<svg version="1.1" x
 		stylePrefixes: ['Moz', 'Webkit', 'Khtml', 'O', 'Ms'],
 		transitionEndEvents: 'webkitTransitionEnd mozTransitionEnd msTransitionEnd oTransitionEnd',
 		_init: function() {
-			this.darkenbg = $('#blurbox-darkenbg');
-			if(!this.darkenbg.length) {
-				this.darkenbg = $('<div id="blurbox-darkenbg" class="blurbox-hidden">');
-				$('body').append(this.darkenbg);
-				this.darkenbg.click(function() {
-					if(plugin.activeBlurbox && plugin.activeBlurbox.options.closeOnBackgroundClick) {
-						plugin.activeBlurbox.hide();
-					}
-				});
-			}
-			
-			this.wrapper = $('#blurbox-wrapper');
-			if(!this.wrapper.length) {
-				this.wrapper = $('<div id="blurbox-wrapper" class="blurbox-hidden">');
-				$('body').append(this.wrapper);
-			}
-			
-			this.bodyContent = $('body').children(':first');
-			
-			this._determineProps();
+			var _that = this;
+			$(function() {
+				_that.darkenbg = $('#blurbox-darkenbg');
+				if(!_that.darkenbg.length) {
+					_that.darkenbg = $('<div id="blurbox-darkenbg" class="blurbox-hidden">');
+					$('body').append(_that.darkenbg);
+					_that.darkenbg.click(function() {
+						if(plugin.activeBlurbox && plugin.activeBlurbox.options.closeOnBackgroundClick) {
+							plugin.activeBlurbox.hide();
+						}
+					});
+				}
+				
+				_that.wrapper = $('#blurbox-wrapper');
+				if(!_that.wrapper.length) {
+					_that.wrapper = $('<div id="blurbox-wrapper" class="blurbox-hidden">');
+					$('body').append(_that.wrapper);
+				}
+				
+				_that.bodyContent = $('body').children(':first');
+				
+				_that._determineProps();
+			});
 		},
 		_testStylePrefixes: function(s, prop, testVal) {
 			// test no prefix first
