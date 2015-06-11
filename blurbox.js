@@ -41,7 +41,8 @@ ffsvg = 'url("data:image/svg+xml;utf8,'+encodeURIComponent('<svg version="1.1" x
 			autosize: true,
 			bgColor: 'rgba(0,0,0,0.2)',
 			bodyContent: null,
-			closeOnBackgroundClick: true
+			closeOnBackgroundClick: true,
+			noscroll: true
 		},
 		activeBlurbox: null,
 		darkenbg: null,
@@ -202,7 +203,9 @@ ffsvg = 'url("data:image/svg+xml;utf8,'+encodeURIComponent('<svg version="1.1" x
 			}
 			
 			// prevent scroll on body
-			this.bodyContent.addClass('blurbox-noscroll');
+			if(this.options.noscroll) {
+				this.bodyContent.addClass('blurbox-noscroll');
+			}
 			// set the popup content and 'show' it
 			plugin.wrapper.html(this.element);
 			this.element.show();
