@@ -73,6 +73,7 @@ Defaults can be set on BlurBox.defaults
 #### BlurBox( element | selector , options )
 
 `element | selector`	This is the content of the lightbox you want to display
+
 `options`	See [Options](#options)
 
 #### BlurBox.hide( options )
