@@ -63,28 +63,28 @@ ffsvg = 'url("data:image/svg+xml;utf8,'+encodeURIComponent('<svg version="1.1" x
 		stylePrefixes: ['Moz', 'Webkit', 'Khtml', 'O', 'Ms'],
 		transitionEndEvents: 'webkitTransitionEnd mozTransitionEnd msTransitionEnd oTransitionEnd',
 		_init: function() {
-			var _that = this;
+			var self = this;
 			$(function() {
-				_that.darkenbg = $('#blurbox-darkenbg');
-				if(!_that.darkenbg.length) {
-					_that.darkenbg = $('<div id="blurbox-darkenbg" class="blurbox-hidden">');
-					$('body').append(_that.darkenbg);
-					_that.darkenbg.click(function() {
+				self.darkenbg = $('#blurbox-darkenbg');
+				if(!self.darkenbg.length) {
+					self.darkenbg = $('<div id="blurbox-darkenbg" class="blurbox-hidden">');
+					$('body').append(self.darkenbg);
+					self.darkenbg.click(function() {
 						if(plugin.activeBlurbox && plugin.activeBlurbox.options.closeOnBackgroundClick) {
 							plugin.activeBlurbox.hide();
 						}
 					});
 				}
 				
-				_that.wrapper = $('#blurbox-wrapper');
-				if(!_that.wrapper.length) {
-					_that.wrapper = $('<div id="blurbox-wrapper" class="blurbox-hidden">');
-					$('body').append(_that.wrapper);
+				self.wrapper = $('#blurbox-wrapper');
+				if(!self.wrapper.length) {
+					self.wrapper = $('<div id="blurbox-wrapper" class="blurbox-hidden">');
+					$('body').append(self.wrapper);
 				}
 				
-				_that.bodyContent = $('body').children(':first');
+				self.bodyContent = $('body').children(':first');
 				
-				_that._determineProps();
+				self._determineProps();
 			});
 		},
 		_testStylePrefixes: function(s, prop, testVal) {
@@ -221,10 +221,10 @@ ffsvg = 'url("data:image/svg+xml;utf8,'+encodeURIComponent('<svg version="1.1" x
 				plugin.wrapper.css({'margin-left':'-'+(plugin.wrapper.width()/2)+'px', 'margin-top':'-'+(plugin.wrapper.height()/2)+'px'})
 			}
 			
-			var t = this,
+			var self = this,
 				endAnim = function() {
-					if(!t.options.animateBlur && t.options.blur > 0) {
-						plugin._applyProp(t.bodyContent[0], 'filter', {blur:t.options.blur});
+					if(!self.options.animateBlur && self.options.blur > 0) {
+						plugin._applyProp(self.bodyContent[0], 'filter', {blur:self.options.blur});
 					}
 					plugin.wrapper.off(plugin.tranisitionEndEvents);
 					clearTimeout(timeout);
@@ -233,11 +233,11 @@ ffsvg = 'url("data:image/svg+xml;utf8,'+encodeURIComponent('<svg version="1.1" x
 			// set timeout at 0 to let elements be rendered first after display:none has been removed
 			setTimeout(function() {
 				plugin.wrapper.addClass('blurbox-show');
-				if(t.options.bgColor) {
+				if(self.options.bgColor) {
 					plugin.darkenbg.addClass('blurbox-show');
 				}
 				
-				timeout = setTimeout(endAnim, t.options.duration+50);
+				timeout = setTimeout(endAnim, self.options.duration+50);
 				plugin.wrapper.on(plugin.tranisitionEndEvents, endAnim);
 			},0);
 			
