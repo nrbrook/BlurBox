@@ -11,7 +11,7 @@
 	
 	var style = '\
 body, html { width: 100%; height: 100%; margin: 0; padding: 0; }\
-.blurbox-noscroll { overflow: hidden; height: 100%; width: 100%; }\
+.blurbox-noScroll { overflow: hidden; height: 100%; width: 100%; }\
 .blurbox-hidden { display: none !important; }\
 #blurbox-wrapper { overflow: auto; padding: 10px; border-radius: 5px; background-color: white; opacity: 0; position: fixed; top: 50%; left: 50%; z-index: 9999; width: 50%; height: 50%; max-width: 95%; max-height: 95%; display: block; }\
 #blurbox-wrapper.blurbox-small { box-sizing: border-box; }\
@@ -42,7 +42,7 @@ ffsvg = 'url("data:image/svg+xml;utf8,'+encodeURIComponent('<svg version="1.1" x
 			bgColor: 'rgba(0,0,0,0.2)',
 			bodyContent: null,
 			closeOnBackgroundClick: true,
-			noscroll: true
+			noScroll: true
 		},
 		activeBlurbox: null,
 		darkenbg: null,
@@ -203,8 +203,8 @@ ffsvg = 'url("data:image/svg+xml;utf8,'+encodeURIComponent('<svg version="1.1" x
 			}
 			
 			// prevent scroll on body
-			if(this.options.noscroll) {
-				this.bodyContent.addClass('blurbox-noscroll');
+			if(this.options.noScroll) {
+				this.bodyContent.addClass('blurbox-noScroll');
 			}
 			// set the popup content and 'show' it
 			plugin.wrapper.html(this.element);
@@ -254,7 +254,7 @@ ffsvg = 'url("data:image/svg+xml;utf8,'+encodeURIComponent('<svg version="1.1" x
 
 			$(document).trigger('blurbox.willHide', this);
 			// allow scroll on body
-			this.bodyContent.removeClass('blurbox-noscroll');
+			this.bodyContent.removeClass('blurbox-noScroll');
 			// hide the wrapper
 			plugin.wrapper.removeClass('blurbox-show');
 			// hide the overlay
