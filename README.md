@@ -58,6 +58,8 @@ Defaults can be set on BlurBox.defaults
 
 `closeOnBackgroundClick` (true) [bool] If true, clicking on the blurred background will close the box
 
+`noScroll` (true) [bool] If true, scrolling of the body content is prevented when the blur box is displayed
+
 ## Function Reference
 
 ### jQuery prototype constructor
