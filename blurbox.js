@@ -11,7 +11,7 @@
 	
 	var style = '\
 body, html { width: 100%; height: 100%; margin: 0; padding: 0; }\
-.blurbox-noScroll { overflow: hidden; height: 100%; width: 100%; }\
+.blurbox-noscroll { overflow: hidden; height: 100%; width: 100%; }\
 .blurbox-hidden { display: none !important; }\
 #blurbox-wrapper { overflow: auto; padding: 10px; border-radius: 5px; background-color: white; opacity: 0; position: fixed; top: 50%; left: 50%; z-index: 9999; width: 50%; height: 50%; max-width: 95%; max-height: 95%; display: block; }\
 #blurbox-wrapper.blurbox-small { box-sizing: border-box; }\
@@ -22,14 +22,14 @@ body, html { width: 100%; height: 100%; margin: 0; padding: 0; }\
 	#blurbox-wrapper { margin: 0; left: 0; height: 100%; width: 100%; top: 100%; opacity: 1; border-radius: 0; max-height: none; max-width: none; }\
 	#blurbox-wrapper.blurbox-show { top: 0; }\
 }\
-',
-ffsvg = 'url("data:image/svg+xml;utf8,'+encodeURIComponent('<svg version="1.1" xmlns="http://www.w3.org/2000/svg"><filter id="blur"><feGaussianBlur stdDeviation="')+'{blur}'+encodeURIComponent('" /></filter></svg>')+'#blur")';
+';
 
 	$('head').append('<style>'+style+'</style>');
 	var pluginName = 'blurbox',
 		plugin = function( element, options ) {
 	        this.element = $(element);
-	        this.options = $.extend( {}, plugin.defaults, options);
+	        this.options = $.extend( {}, plugin.defaults );
+	        this.applyOptions(options);
 	        this._init();
 	    };
 		
@@ -37,12 +37,13 @@ ffsvg = 'url("data:image/svg+xml;utf8,'+encodeURIComponent('<svg version="1.1" x
 		defaults: {
 			blur: 3,
 			animateBlur: true,
-			duration: 300,
+			duration: 500,
+			compactTimingFunction: null,
+			compactTimingFunctionIn: 'cubic-bezier(0.165, 0.84, 0.44, 1)',
+            compactTimingFunctionOut: 'cubic-bezier(0.55, 0.055, 0.675, 0.19)',
 			autosize: true,
 			bgColor: 'rgba(0,0,0,0.2)',
-			bodyContent: null,
-			closeOnBackgroundClick: true,
-			noScroll: true
+			bodyContent: null
 		},
 		activeBlurbox: null,
 		darkenbg: null,
@@ -50,7 +51,7 @@ ffsvg = 'url("data:image/svg+xml;utf8,'+encodeURIComponent('<svg version="1.1" x
 		bodyContent: null,
 		styleProps: {
 			filter: 'filter',
-			transition: 'transition',
+			transition: 'transition'
 		},
 		cssProps: {
 			filter: 'filter',
@@ -58,40 +59,35 @@ ffsvg = 'url("data:image/svg+xml;utf8,'+encodeURIComponent('<svg version="1.1" x
 		},
 		stylePropVals: {
 			filter: 'blur({blur}px)',
-			transition: '{prop} {dur}ms'
+			transition: '{prop} {dur}ms {timing}'
 		},
 		stylePrefixes: ['Moz', 'Webkit', 'Khtml', 'O', 'Ms'],
 		transitionEndEvents: 'webkitTransitionEnd mozTransitionEnd msTransitionEnd oTransitionEnd',
 		_init: function() {
-			var self = this;
-			$(function() {
-				self.darkenbg = $('#blurbox-darkenbg');
-				if(!self.darkenbg.length) {
-					self.darkenbg = $('<div id="blurbox-darkenbg" class="blurbox-hidden">');
-					$('body').append(self.darkenbg);
-					self.darkenbg.click(function() {
-						if(plugin.activeBlurbox && plugin.activeBlurbox.options.closeOnBackgroundClick) {
-							plugin.activeBlurbox.hide();
-						}
-					});
-				}
-				
-				self.wrapper = $('#blurbox-wrapper');
-				if(!self.wrapper.length) {
-					self.wrapper = $('<div id="blurbox-wrapper" class="blurbox-hidden">');
-					$('body').append(self.wrapper);
-				}
-				
-				self.bodyContent = $('body').children(':first');
-				
-				self._determineProps();
-			});
+			this.darkenbg = $('#blurbox-darkenbg');
+			if(!this.darkenbg.length) {
+				this.darkenbg = $('<div id="blurbox-darkenbg" class="blurbox-hidden">');
+				$('body').append(this.darkenbg);
+				this.darkenbg.click(function() {
+					plugin.activeBlurbox.hide();
+				});
+			}
+			
+			this.wrapper = $('#blurbox-wrapper');
+			if(!this.wrapper.length) {
+				this.wrapper = $('<div id="blurbox-wrapper" class="blurbox-hidden">');
+				$('body').append(this.wrapper);
+			}
+			
+			this.bodyContent = $('.blurbox-bodyContent').first();
+			
+			this._determineProps();
 		},
 		_testStylePrefixes: function(s, prop, testVal) {
 			// test no prefix first
 			if(s[prop] !== undefined) {
 				s[prop] = testVal;
-				if(s[testprop] === testVal) {
+				if(s[prop] === testVal) {
 					plugin.styleProps[prop] = prop;
 					plugin.cssProps[prop] = prop;
 					return;
@@ -115,15 +111,7 @@ ffsvg = 'url("data:image/svg+xml;utf8,'+encodeURIComponent('<svg version="1.1" x
 		},
 		_determineProps: function() {
 			var s = $('<div>')[0].style;
-			plugin._testStylePrefixes(s, 'filter', 'blur(3px)')
-			if(plugin.styleProps.filter === 'filter') {
-				// test for moz
-				var testval = ffsvg.replace('{blur}',1);
-				s.filter = testval;
-				if(s.filter === testval) {
-					plugin.stylePropVals.filter = ffsvg;
-				}
-			}
+			plugin._testStylePrefixes(s, 'filter', 'blur(3px)');
 			plugin._testStylePrefixes(s, 'transition', 'width 100ms');
 		},
 		_applyProp: function(el,prop,subs) {
@@ -161,26 +149,34 @@ ffsvg = 'url("data:image/svg+xml;utf8,'+encodeURIComponent('<svg version="1.1" x
 		_init: function() {
 			this.displayed = false;
 			this.element.detach();
-			this.applyOptions(this.options);
 		},
+
+		_updateStyles: function () {
+            var isSmall = $('body').width() <= 480;
+            var timing = (isSmall && (this.options.compactTimingFunction || this.options['compactTimingFunction' + (this.displayed ? 'Out' : 'In')])) || 'linear';
+            plugin._applyProp(plugin.wrapper[0], 'transition', {prop:isSmall ? 'top' : 'opacity',dur:this.options.duration,timing: timing});
+            plugin._applyProp(plugin.darkenbg[0], 'transition', {prop:'opacity',dur:this.options.duration, timing: 'linear'});
+            if(this.options.animateBlur) {
+                plugin._applyProp(this.bodyContent[0], 'transition', {prop:plugin.cssProps.filter,dur:this.options.duration, timing: 'linear'});
+            } else {
+                plugin._removeProp(this.bodyContent[0], 'transition');
+            }
+
+            plugin.darkenbg.css('backgroundColor', this.options.bgColor || '');
+        },
 		
 		applyOptions: function(options) {
-			this.options = $.extend( {}, this.options, options);
+			this.options = $.extend(this.options, options);
 			
 			this.bodyContent = this.options.bodyContent || plugin.bodyContent;
+            if(!this.bodyContent || this.bodyContent.length == 0) {
+                console.error('Please pass your main body container element as the bodyContent option or give it the class \'.blurbox-body\'');
+                return;
+            }
+
 			this.bodyContent.addClass('blurbox-bodyContent');
 			
-			// apply styles
-			var isSmall = $('body').width() <= 480;
-			plugin._applyProp(plugin.wrapper[0], 'transition', {prop:isSmall ? 'top' : 'opacity',dur:this.options.duration});
-			plugin._applyProp(plugin.darkenbg[0], 'transition', {prop:'opacity',dur:this.options.duration});
-			if(this.options.animateBlur) {
-				plugin._applyProp(this.bodyContent[0], 'transition', {prop:plugin.cssProps.filter,dur:this.options.duration});
-			} else {
-				plugin._removeProp(this.bodyContent[0], 'transition');
-			}
-			
-			plugin.darkenbg.css('backgroundColor', this.options.bgColor || '');
+			this._updateStyles();
 		},
 		
 		show: function(options) {
@@ -203,9 +199,7 @@ ffsvg = 'url("data:image/svg+xml;utf8,'+encodeURIComponent('<svg version="1.1" x
 			}
 			
 			// prevent scroll on body
-			if(this.options.noScroll) {
-				this.bodyContent.addClass('blurbox-noScroll');
-			}
+			this.bodyContent.addClass('blurbox-noscroll');
 			// set the popup content and 'show' it
 			plugin.wrapper.html(this.element);
 			this.element.show();
@@ -221,10 +215,10 @@ ffsvg = 'url("data:image/svg+xml;utf8,'+encodeURIComponent('<svg version="1.1" x
 				plugin.wrapper.css({'margin-left':'-'+(plugin.wrapper.width()/2)+'px', 'margin-top':'-'+(plugin.wrapper.height()/2)+'px'})
 			}
 			
-			var self = this,
+			var t = this,
 				endAnim = function() {
-					if(!self.options.animateBlur && self.options.blur > 0) {
-						plugin._applyProp(self.bodyContent[0], 'filter', {blur:self.options.blur});
+					if(!t.options.animateBlur && t.options.blur > 0) {
+						plugin._applyProp(t.bodyContent[0], 'filter', {blur:t.options.blur});
 					}
 					plugin.wrapper.off(plugin.tranisitionEndEvents);
 					clearTimeout(timeout);
@@ -233,11 +227,12 @@ ffsvg = 'url("data:image/svg+xml;utf8,'+encodeURIComponent('<svg version="1.1" x
 			// set timeout at 0 to let elements be rendered first after display:none has been removed
 			setTimeout(function() {
 				plugin.wrapper.addClass('blurbox-show');
-				if(self.options.bgColor) {
+				if(t.options.bgColor) {
 					plugin.darkenbg.addClass('blurbox-show');
 				}
+				t.bodyContent.on('click.blurbox', $.proxy(t.hide,t));
 				
-				timeout = setTimeout(endAnim, self.options.duration+50);
+				timeout = setTimeout(endAnim, t.options.duration+50);
 				plugin.wrapper.on(plugin.tranisitionEndEvents, endAnim);
 			},0);
 			
@@ -253,8 +248,9 @@ ffsvg = 'url("data:image/svg+xml;utf8,'+encodeURIComponent('<svg version="1.1" x
 			this.applyOptions((options && $.isPlainObject(options)) || {});
 
 			$(document).trigger('blurbox.willHide', this);
+			this.bodyContent.off('click.blurbox');
 			// allow scroll on body
-			this.bodyContent.removeClass('blurbox-noScroll');
+			this.bodyContent.removeClass('blurbox-noscroll');
 			// hide the wrapper
 			plugin.wrapper.removeClass('blurbox-show');
 			// hide the overlay
@@ -296,7 +292,8 @@ ffsvg = 'url("data:image/svg+xml;utf8,'+encodeURIComponent('<svg version="1.1" x
 				this.element.detach();
 				style ? this.element.attr('style', style) : this.element.removeAttr('style');
 			}
-			plugin.wrapper.css({width:width,height:height});
+			plugin.wrapper.height(height);
+			plugin.wrapper.width(width);
 		}
 	});
 	

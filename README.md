@@ -54,7 +54,13 @@ Defaults can be set on BlurBox.defaults
 
 `bgColor` ('rgba(0,0,0,0.2)') [colour string] If not null, the plugin will tint the background with this colour
 
-`bodyContent` (null) [element] The plugin will blur this element.  By default, uses the first child of `body`
+`bodyContent` (null) [element] The plugin will blur this element.  By default, uses the first element with the class `blurbox-bodyContent`
+
+`compactTimingFunctionIn` 'cubic-bezier(0.165, 0.84, 0.44, 1)' [string] The CSS transition timing function to use for in transitions when in compact mode (small widths)
+
+`compactTimingFunctionOut` 'cubic-bezier(0.55, 0.055, 0.675, 0.19)' [string] The CSS transition timing function to use for out transitions when in compact mode (small widths)
+
+`compactTimingFunction` (null) [string] The CSS transition timing function to use for both in and out transitions when in compact mode (small widths). Any non-null value will override the 'compactTimingFunctionIn' and 'compactTimingFunctionOut' options
 
 `closeOnBackgroundClick` (true) [bool] If true, clicking on the blurred background will close the box
 
