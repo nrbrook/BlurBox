@@ -30,17 +30,18 @@ require(['blurbox'], function(BlurBox) {
 });
 ```
 
-## Prerequisites
+
+## Prerequisites
 
 This works by adding a blur filter to the main body content.  As such, you must have a container element which contains everything you want to blur that isn't the `body` element.  By default, the plugin uses the first child of body.  You can specify a different element as `options.bodyContent`
 
 ## Compatibility
 
-While not well tested, this should work in IE 6+ (maybe), Firefox, Safari, Chrome, Opera
+While not very extensively tested, this should work in IE 6+ (maybe), Firefox, Safari, Chrome, Opera
 
 ## Options
 
-The options object can be passed in to the constructor, set afterwards using `object.applyOptions( options )`, or passed in to `show()` and `hide()`
+The options object can be passed in to the constructor, set afterwards using `object.applyOptions( options )`, or passed in to `show( options )` and `hide( options )`
 
 Defaults can be set on BlurBox.defaults
 
@@ -56,11 +57,11 @@ Defaults can be set on BlurBox.defaults
 
 `bodyContent` (null) [element] The plugin will blur this element.  By default, uses the first element with the class `blurbox-bodyContent`
 
-`compactTimingFunctionIn` 'cubic-bezier(0.165, 0.84, 0.44, 1)' [string] The CSS transition timing function to use for in transitions when in compact mode (small widths)
+`compactTimingFunctionIn` ('cubic-bezier(0.165, 0.84, 0.44, 1)') [string] The CSS transition timing function to use for in transitions when in compact mode (small widths)
 
-`compactTimingFunctionOut` 'cubic-bezier(0.55, 0.055, 0.675, 0.19)' [string] The CSS transition timing function to use for out transitions when in compact mode (small widths)
+`compactTimingFunctionOut` ('cubic-bezier(0.55, 0.055, 0.675, 0.19)') [string] The CSS transition timing function to use for out transitions when in compact mode (small widths)
 
-`compactTimingFunction` (null) [string] The CSS transition timing function to use for both in and out transitions when in compact mode (small widths). Any non-null value will override the 'compactTimingFunctionIn' and 'compactTimingFunctionOut' options
+`compactTimingFunction` (null) [string] The CSS transition timing function to use for both in and out transitions when in compact mode (small widths). Any non-null value will override the `compactTimingFunctionIn` and `compactTimingFunctionOut` options
 
 `closeOnBackgroundClick` (true) [bool] If true, clicking on the blurred background will close the box
 
